@@ -27,7 +27,7 @@ version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 version_release=${version%-SNAPSHOT}
 
 ### Parameters
-dev_branch='master'
+default_branch='master'
 release_branch='release'
 maven_args=''
 maven_skip_release='true'
@@ -35,8 +35,8 @@ maven_skip_release='true'
 #
 #while [ $# -gt 1 ] ; do
 #case $1 in
-#-b) dev_branch=$2 ; shift 2 ;;
-#--branch) dev_branch=$2 ; shift 2 ;;
+#-b) default_branch=$2 ; shift 2 ;;
+#--branch) default_branch=$2 ; shift 2 ;;
 #-hf) hotfix=$2 ; shift 2 ;;
 #--hotfix) hotfix=$2 ; shift 2 ;;
 #--maven_args) maven_args=$2 ; shift 2 ;;
@@ -124,12 +124,12 @@ function checkout_release_branch() {
 }
 
 function checkout_dev_branch() {
-  echo "[#] MAJ branch '$dev_branch'"
-  git checkout $dev_branch
-  git pull origin $dev_branch
+  echo "[#] MAJ branch '$default_branch'"
+  git checkout $default_branch
+  git pull origin $default_branch
 
   if [ $? -ne 0 ]; then
-    echo "fatal - Cannot pull branch $dev_branch"
+    echo "fatal - Cannot pull branch $default_branch"
     echo "[###] Released v$version_release [FAILED]"
     exit 1
   fi
@@ -137,7 +137,7 @@ function checkout_dev_branch() {
 
 echo "-----------------------------------------------------------------------"
 echo " Release $version to $version_release "
-echo " (local branch : $dev_branch) "
+echo " (local branch : $default_branch) "
 echo "-----------------------------------------------------------------------"
 
 assert_snapshot_version
@@ -148,15 +148,15 @@ checkout_release_branch
 checkout_dev_branch
 
 echo "[#] create branch release/v$version "
-## branch from develop to a new release branch
-git checkout $dev_branch
+## branch from default to a new release branch
+git checkout $default_branch
 git checkout -b release/v$version_release
 
 maven_release
 
 echo "[#] Merge release/v$version_release to develop"
 ## merge the version changes back into develop so that folks are working against the new release ("0.0.3-SNAPSHOT", in this case)
-git checkout $dev_branch
+git checkout $default_branch
 git merge --no-ff release/v$version_release
 
 ## housekeeping -- rewind the release branch by one commit to fix its version at "0.0.2"
@@ -166,7 +166,7 @@ git merge --no-ff release/v$version_release
 git checkout release/v$version_release
 git reset --hard HEAD~1
 git push --force origin release/v$version_release
-#git checkout $dev_branch
+#git checkout $default_branch
 #
 #echo "[#] Merge release/v$version_release to $release_branch"
 #
