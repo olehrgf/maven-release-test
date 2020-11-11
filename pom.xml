@@ -109,7 +109,7 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <releaseProfiles>releases</releaseProfiles>
                     <scmCommentPrefix>[release]</scmCommentPrefix>
-                    <branchName>release-v@{project.version}</branchName>
+                    <branchName>release-v${project.version}</branchName>
                     <updateBranchVersions>false</updateBranchVersions>
                     <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
 <!--                    <suppressCommitBeforeBranch>true</suppressCommitBeforeBranch>-->
