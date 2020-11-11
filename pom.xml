@@ -110,9 +110,9 @@
                     <releaseProfiles>releases</releaseProfiles>
                     <scmCommentPrefix>[release]</scmCommentPrefix>
                     <branchName>release-v${project.version}</branchName>
-                    <updateBranchVersions>false</updateBranchVersions>
+                    <updateBranchVersions>true</updateBranchVersions>
                     <updateWorkingCopyVersions>false</updateWorkingCopyVersions>
-<!--                    <suppressCommitBeforeBranch>true</suppressCommitBeforeBranch>-->
+                    <suppressCommitBeforeBranch>true</suppressCommitBeforeBranch>
                 </configuration>
             </plugin>
         </plugins>
