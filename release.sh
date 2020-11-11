@@ -123,7 +123,7 @@ function checkout_release_branch() {
   fi
 }
 
-function checkout_dev_branch() {
+function checkout_default_branch() {
   echo "[#] MAJ branch '$default_branch'"
   git checkout $default_branch
   git pull origin $default_branch
@@ -145,7 +145,7 @@ assert_branch_version_exist
 assert_tag_version_exist
 
 checkout_release_branch
-checkout_dev_branch
+checkout_default_branch
 
 echo "[#] create branch release/v$version "
 ## branch from default to a new release branch
@@ -154,8 +154,9 @@ git checkout -b release/v$version_release
 
 maven_release
 
-echo "[#] Merge release/v$version_release to develop"
+echo "[#] Merge release/v$version_release to $default_branch"
 ## merge the version changes back into develop so that folks are working against the new release ("0.0.3-SNAPSHOT", in this case)
+git fetch $default_branch
 git checkout $default_branch
 git merge --no-ff release/v$version_release
 
