@@ -12,23 +12,13 @@
 #  release.sh --branch <name_local_branch>
 #  release.sh -b <name_local_branch>
 #
-#  Specify is a hotfix branch / it will merge on 'MASTER' and 'DEVELOP'
-#  release.sh -hf <true/false>
-#  release.sh --hotfix <true/false>
-#
-#  Specify maven arguments (during release/perform goal)
-#  release.sh --maven_args <arguments>
-#
-#
-#  [REQUIRED] need the libxml-xpath-perl / sudo apt-get install  libxml-xpath-perl
-#
 # Read the version
 version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 version_release=${version%-SNAPSHOT}
 
 ### Parameters
 default_branch='master'
-release_branch='release'
+release_branch='release/latest'
 maven_args=''
 maven_skip_release='true'
 #
@@ -111,17 +101,17 @@ function maven_release() {
   fi
 }
 
-#function checkout_release_branch() {
-#  echo "[#] Checkout branch '$release_branch'"
-#  git checkout $release_branch
-#  git pull origin $release_branch
-#
-#  if [ $? -ne 0 ]; then
-#    echo "fatal - Cannot pull branch '$release_branch'"
-#    echo "[###] Released v$version_release [FAILED]"
-#    exit 1
-#  fi
-#}
+function checkout_release_branch() {
+  echo "[#] Checkout branch '$release_branch'"
+  git checkout $release_branch
+  git pull origin $release_branch
+
+  if [ $? -ne 0 ]; then
+    echo "fatal - Cannot pull branch '$release_branch'"
+    echo "[###] Released v$version_release [FAILED]"
+    exit 1
+  fi
+}
 
 function checkout_default_branch() {
   echo "[#] MAJ branch '$default_branch'"
@@ -144,48 +134,35 @@ assert_snapshot_version
 assert_branch_version_exist
 assert_tag_version_exist
 
-#checkout_release_branch
+checkout_release_branch
 checkout_default_branch
 
 echo "[#] create branch release/v$version "
 ## branch from default to a new release branch
-#git checkout -b release/v$version_release
-#git checkout $default_branch
+git checkout $default_branch
+git checkout -b release/v$version_release
 
 maven_release
 
 echo "[#] Merge release/v$version_release to $default_branch"
 ## merge the version changes back into develop so that folks are working against the new release ("0.0.3-SNAPSHOT", in this case)
-git checkout -b release/v$version_release
-#git checkout release/v$version_release
-git merge --no-ff $default_branch
+git checkout $default_branch
+git merge --no-ff release/v$version_release
 
 ## housekeeping -- rewind the release branch by one commit to fix its version at "0.0.2"
 ##	excuse the force push, it's because maven will have already pushed '0.0.3-SNAPSHOT'
 ##	to origin with this branch, and I don't want that version (or a diverging revert commit)
 ##	in the release or $release_branch branches.
-#git checkout release/v$version_release
+git checkout release/v$version_release
 git reset --hard HEAD~1
 git push --force origin release/v$version_release
-#git checkout $default_branch
-#
-#echo "[#] Merge release/v$version_release to $release_branch"
-#
-### finally, if & when the code gets deployed to production
-#git checkout $release_branch
-#git merge --no-ff release/v$version_release
-#git push --all && git push --tags
 
-#if $hotfix; then
-#  echo "[!] hotfix activated, going to merge on branch 'develop'"
-#  git checkout develop
-#  git pull origin develop
-#  git merge --no-ff release/v$version_release
-#  git push origin HEAD
-#fi
+git checkout $default_branch
 
-##delete branch release local and remote
-#git branch -d release/v$version_release
-#git push origin :release/v$version_release
-#
+echo "[#] Merge release/v$version_release to $release_branch"
+## finally, if & when the code gets deployed to production
+git checkout $release_branch
+git merge --no-ff release/v$version_release
+git push --force origin $release_branch
+
 echo "[###] Released v$version_release [SUCCESS]"
