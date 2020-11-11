@@ -18,7 +18,7 @@ version_release=${version%-SNAPSHOT}
 
 ### Parameters
 default_branch='master'
-release_branch='release/latest'
+#release_branch='release/latest'
 maven_args=''
 maven_skip_release='true'
 #
@@ -101,17 +101,17 @@ function maven_release() {
   fi
 }
 
-function checkout_release_branch() {
-  echo "[#] Checkout branch '$release_branch'"
-  git checkout $release_branch
-  git pull origin $release_branch
-
-  if [ $? -ne 0 ]; then
-    echo "fatal - Cannot pull branch '$release_branch'"
-    echo "[###] Released v$version_release [FAILED]"
-    exit 1
-  fi
-}
+#function checkout_release_branch() {
+#  echo "[#] Checkout branch '$release_branch'"
+#  git checkout $release_branch
+#  git pull origin $release_branch
+#
+#  if [ $? -ne 0 ]; then
+#    echo "fatal - Cannot pull branch '$release_branch'"
+#    echo "[###] Released v$version_release [FAILED]"
+#    exit 1
+#  fi
+#}
 
 function checkout_default_branch() {
   echo "[#] MAJ branch '$default_branch'"
@@ -134,7 +134,7 @@ assert_snapshot_version
 assert_branch_version_exist
 assert_tag_version_exist
 
-checkout_release_branch
+#checkout_release_branch
 checkout_default_branch
 
 echo "[#] create branch release/v$version "
@@ -156,13 +156,14 @@ git merge --no-ff release/v$version_release
 git checkout release/v$version_release
 git reset --hard HEAD~1
 git push --force origin release/v$version_release
+#git push --force origin $release_branch
+#git checkout $default_branch
 
-git checkout $default_branch
-
-echo "[#] Merge release/v$version_release to $release_branch"
+#echo "[#] Merge release/v$version_release to $release_branch"
 ## finally, if & when the code gets deployed to production
-git checkout $release_branch
-git merge --no-ff release/v$version_release
-git push --force origin $release_branch
+#git checkout $release_branch
+#git rebase release/v$version_release
+#git merge --no-ff release/v$version_release
+#git push --force origin $release_branch
 
 echo "[###] Released v$version_release [SUCCESS]"
