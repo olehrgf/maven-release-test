@@ -18,25 +18,25 @@ version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
 echo "[*] Commit new incremental version to $default_branch"
 git checkout $default_branch
-git merge --no-ff $release_branch
 git commit -a -m "[release] Automatic incremental release v$version"
 git tag -a "v$version" -m "[release] Automatic incremental release v$version"
+git push --force origin $default_branch
+git push origin --tags
 
 echo "[*] Commit new incremental version to $release_branch"
 git checkout -b $release_branch
-git commit -m "[release] Automatic incremental release v$version"
 git push --force origin $release_branch
 
-#git checkout $default_branch
-#mvn build-helper:parse-version versions:set \
-#  -DnextSnapshot=true \
-#  -DnewVersion="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}"
-#
-#version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-#git commit -m "[release] Automatic incremental development iteration v$version"
-#git push --force origin $default_branch
-#
-#git branch -D $release_branch
+git checkout $default_branch
+mvn build-helper:parse-version versions:set \
+  -DnextSnapshot=true \
+  -DnewVersion="\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}"
+
+version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+git commit -m "[release] Automatic incremental development iteration v$version"
+git push --force origin $default_branch
+
+git branch -D $release_branch
 
 
 
