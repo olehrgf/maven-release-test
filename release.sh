@@ -19,7 +19,7 @@ version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 echo "[*] Commit new incremental version to $default_branch"
 git checkout $default_branch
 git merge --no-ff $release_branch
-git commit -m "[release] Automatic incremental release v$version"
+git commit -a -m "[release] Automatic incremental release v$version"
 git tag -a "v$version" -m "[release] Automatic incremental release v$version"
 
 echo "[*] Commit new incremental version to $release_branch"
