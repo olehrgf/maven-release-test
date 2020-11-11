@@ -149,14 +149,15 @@ checkout_default_branch
 
 echo "[#] create branch release/v$version "
 ## branch from default to a new release branch
-git checkout -b release/v$version_release
-git checkout $default_branch
+#git checkout -b release/v$version_release
+#git checkout $default_branch
 
 maven_release
 
 echo "[#] Merge release/v$version_release to $default_branch"
 ## merge the version changes back into develop so that folks are working against the new release ("0.0.3-SNAPSHOT", in this case)
-git checkout release/v$version_release
+git checkout -b release/v$version_release
+#git checkout release/v$version_release
 git merge --no-ff $default_branch
 
 ## housekeeping -- rewind the release branch by one commit to fix its version at "0.0.2"
