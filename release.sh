@@ -111,17 +111,17 @@ function maven_release() {
   fi
 }
 
-function checkout_release_branch() {
-  echo "[#] Checkout branch '$release_branch'"
-  git checkout $release_branch
-  git pull origin $release_branch
-
-  if [ $? -ne 0 ]; then
-    echo "fatal - Cannot pull branch '$release_branch'"
-    echo "[###] Released v$version_release [FAILED]"
-    exit 1
-  fi
-}
+#function checkout_release_branch() {
+#  echo "[#] Checkout branch '$release_branch'"
+#  git checkout $release_branch
+#  git pull origin $release_branch
+#
+#  if [ $? -ne 0 ]; then
+#    echo "fatal - Cannot pull branch '$release_branch'"
+#    echo "[###] Released v$version_release [FAILED]"
+#    exit 1
+#  fi
+#}
 
 function checkout_default_branch() {
   echo "[#] MAJ branch '$default_branch'"
@@ -144,7 +144,7 @@ assert_snapshot_version
 assert_branch_version_exist
 assert_tag_version_exist
 
-checkout_release_branch
+#checkout_release_branch
 checkout_default_branch
 
 echo "[#] create branch release/v$version "
