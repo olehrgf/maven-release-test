@@ -166,14 +166,14 @@ git merge --no-ff release/v$version_release
 git checkout release/v$version_release
 git reset --hard HEAD~1
 git push --force origin release/v$version_release
-git checkout $dev_branch
-
-echo "[#] Merge release/v$version_release to $release_branch"
-
-## finally, if & when the code gets deployed to production
-git checkout $release_branch
-git merge --no-ff release/v$version_release
-git push --all && git push --tags
+#git checkout $dev_branch
+#
+#echo "[#] Merge release/v$version_release to $release_branch"
+#
+### finally, if & when the code gets deployed to production
+#git checkout $release_branch
+#git merge --no-ff release/v$version_release
+#git push --all && git push --tags
 
 #if $hotfix; then
 #  echo "[!] hotfix activated, going to merge on branch 'develop'"
