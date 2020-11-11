@@ -149,22 +149,21 @@ checkout_default_branch
 
 echo "[#] create branch release/v$version "
 ## branch from default to a new release branch
-git checkout $default_branch
 git checkout -b release/v$version_release
+git checkout $default_branch
 
 maven_release
 
 echo "[#] Merge release/v$version_release to $default_branch"
 ## merge the version changes back into develop so that folks are working against the new release ("0.0.3-SNAPSHOT", in this case)
-git fetch $default_branch
-git checkout $default_branch
-git merge --no-ff release/v$version_release
+git checkout release/v$version_release
+git merge --no-ff $default_branch
 
 ## housekeeping -- rewind the release branch by one commit to fix its version at "0.0.2"
 ##	excuse the force push, it's because maven will have already pushed '0.0.3-SNAPSHOT'
 ##	to origin with this branch, and I don't want that version (or a diverging revert commit)
 ##	in the release or $release_branch branches.
-git checkout release/v$version_release
+#git checkout release/v$version_release
 git reset --hard HEAD~1
 git push --force origin release/v$version_release
 #git checkout $default_branch
